@@ -23,6 +23,8 @@ grid: "http://ursaucelabsurl@ondemand.saucelabs.com:80/wd/hub"
 maxthreads: 3
 ```
 
+-don't worry the ``` config.yaml ``` file is in the .gitignore and won't be checked in.
+
 -make the maxthreads 1 more than you have in your saucelabs account.  This makes sure one is on standby and the others do not time out.  The free saucelabs account comes with 2 threads so start with 3!
 
 Edit the ``` browsers.yaml``` file
