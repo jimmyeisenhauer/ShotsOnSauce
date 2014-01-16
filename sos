@@ -1,0 +1,138 @@
+#!/usr/bin/env ruby
+require 'optparse'
+require 'ostruct'
+require 'selenium-webdriver'
+require 'RMagick'
+require 'uri'
+require "yaml"
+require 'thread/pool'
+require 'colored'
+require "artii"
+include Magick
+
+class Browser 
+ attr_accessor :name, :version, :platform, :resolution
+end
+ 
+options = OpenStruct.new
+options.encoding = "utf8"
+optparse = OptionParser.new do |opts|
+ 
+  opts.on('-h', 'Shows this help screen') do
+    puts opts
+    exit
+  end
+  opts.on('-u', '--url URL', 'Set the URL to take screen shots of') do |url|
+    options.url = url
+  end
+end.parse!
+
+begin
+  optparse.parse!
+  mandatory = [:url]                                         # Enforce the presence of
+  missing = mandatory.select{ |param| options[param].nil? }        
+  if not missing.empty?                                            #
+    puts "Missing options: #{missing.join(', ')}"                  #
+    puts optparse                                                  #
+    exit                                                           #
+  end     
+  rescue OptionParser::InvalidOption, OptionParser::MissingArgument      #
+  puts $!.to_s                                                           # Friendly output when parsing fails
+  puts optparse                                                          #
+  exit                                                                   #
+end           
+
+
+$url = options.url.to_s
+
+
+
+class ShotsOnSauce
+
+# load configuration
+CONFIGYAML = 'config.yaml'
+if File.exists? (CONFIGYAML)
+cfg = YAML::load(File.open(CONFIGYAML))
+grid = cfg['grid']
+maxthreads = cfg['maxthreads']
+else
+abort("Missing config.yaml file".red_on_yellow)
+end
+pool = Thread.pool(maxthreads) # COUNT OF YOUR THREADS 
+# load up all the browsers in a array
+BROWSERSYAML = 'browsers.yaml'
+if File.exists? (BROWSERSYAML)
+browsers = YAML::load(File.open(BROWSERSYAML))
+else
+abort("Missing browsers.yaml file".red_on_yellow)
+end
+
+
+
+      # clean up the url for documentation
+    
+      uri = URI.parse(URI.encode($url))
+      #quick little url valid check for debugging - needs better url error handling
+      puts uri.kind_of? URI::HTTP
+
+      cleanUrl = uri.host.to_s + uri.path.to_s + uri.query.to_s
+      a = Artii::Base.new :font => 'big'
+      puts a.asciify('Shots on Sauce!').bold.blue
+      puts ('a github super diff screen-shotting machine').blue
+      puts ('--------------------------------------------').blue
+      browsers.each do |b|
+
+      pool.process { 
+      puts ("INFO: Opening " + b.name +  " " + b.version + " driver").blue
+      imageName = ((b.name + "_" + b.version + "_" + b.platform + "_" + cleanUrl.gsub(/[^a-zA-Z 0-9]/, "-")).gsub(/\s/,'-')) + ".png"
+      
+      caps = Selenium::WebDriver::Remote::Capabilities.send(b.name.to_sym)
+      caps.version =  b.version
+      caps.platform = b.platform
+      caps['screen-resolution'] = b.resolution
+      caps[:name] = "Shots on Sauce - " + b.name + " " + b.version
+      caps['max-duration'] = 300
+      driver = Selenium::WebDriver.for(:remote, :url => grid, :desired_capabilities => caps)
+      driver.manage.window.maximize
+      driver.manage.timeouts.implicit_wait = 60
+
+      driver.get($url)
+      puts ("INFO: Taking Screen Shot of: " + $url + " using " + b.name + " " + b.version + " on " + b.platform).bold.red
+      File.delete(imageName) if File.exist?(imageName)
+      driver.save_screenshot imageName
+
+      begin
+      # need to make the images smaller github diff won't handle large file sizes
+      # Read first image from file
+      image = Magick::Image::read(imageName).first
+      # Resize image to maxium dimensions
+      image.resize_to_fit!(600,100000)
+      # Write image to file system
+      image.write(imageName)
+      # Free image from memory
+      image.destroy!
+      rescue Exception => e
+      puts e
+      end
+
+      driver.quit
+      }
+      end
+      pool.shutdown
+
+      puts "INFO: Commiting to github"
+      system('git add . --ignore-removal')
+      system("git commit -m #{cleanUrl} ")
+      system('git push origin master')
+
+      puts "INFO: Cleaning up and then done!".bold.red
+      system('rm *.png')
+
+
+
+
+end
+
+
+
+
