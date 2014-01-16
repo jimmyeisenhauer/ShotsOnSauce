@@ -15,7 +15,11 @@ Install the components
 ``` bundle install ```
 
 Go to www.saucelabs.com and sign up for a account and find your grid url
-create a ``` config.yaml ``` file in the root directory
+
+A easy way to find your saucelabs url is to go here: https://saucelabs.com/docs/ondemand/getting-started/env/ruby/se2/mac
+
+
+Create a ``` config.yaml ``` file in the root directory
 add the below two lines to it
 
 ```
