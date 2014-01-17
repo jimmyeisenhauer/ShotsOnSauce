@@ -1,11 +1,22 @@
 Shots on Sauce
 ===========
-Open source, cloud based, web browser screen shot comparison tool.  Utilizes github & saucelabs cloud based services.  
+An open source, github super diff screen-shotting machine.
 
-Developed and tested on a Mac.  Pull-requests and feature-requests are welcomed.  Follow the Fork, Config, Shoot instructions below to get up and running!
+Developed and tested on a Mac.  
+Pull-requests and feature-requests are welcomed.  
 
-##It uses the github image diff tool
-![rest screenshot web service](http://github-images.s3.amazonaws.com/blog/2011/vm-swipe.jpg) 
+##It uses the Github image diff tool
+![diff sample](http://github-images.s3.amazonaws.com/blog/2011/vm-swipe.jpg) 
+
+##And Saucelab's giant data center of browsers
+![saucelabs](https://saucelabs.com/images/features/browsers-platforms.jpg)
+
+##To make browser screen shot comparisons simple!
+
+##See a sample end result
+https://github.com/pdx-se/ShotsOnSauce/commit/9533ea4010661a435c08fc467edd2d6a8892349f
+
+##Follow the FORK, CONFIG, SHOOT instructions below to get up and running!
 
 #FORK
 Hit the little fork button in the top right.  Then clone the fork to your computer
