@@ -4,6 +4,8 @@ Open source, cloud based, web browser screen shot comparison tool.  Utilizes git
 
 Developed and tested on a Mac.  Pull-requests and feature-requests are welcomed.  Follow the Fork, Config, Shoot instructions below to get up and running!
 
+##It uses the github image diff tool
+![rest screenshot web service](http://github-images.s3.amazonaws.com/blog/2011/vm-swipe.jpg) 
 
 #FORK
 Hit the little fork button in the top right.  Then clone the fork to your computer
